@@ -1,13 +1,9 @@
 package ru.aivanitskiy.hw02;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class DIYarrayList<T> implements List<T> {
     private static final int DEFAULT_CAPACITY = 2;
-    private int capacity;
     private int size = 0;
     private Object[] storage;
 
@@ -16,7 +12,6 @@ public class DIYarrayList<T> implements List<T> {
     }
 
     public DIYarrayList(int capacity) {
-        this.capacity = capacity;
         storage = new Object[capacity];
     }
     
@@ -54,7 +49,7 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public boolean add(T t) {
-        if(size >= capacity) {
+        if(size >= storage.length) {
             increaseCapacity();
         }
         storage[size] = t;
@@ -101,7 +96,7 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -140,7 +135,7 @@ public class DIYarrayList<T> implements List<T> {
     @Override
     public void add(int index, T element) {
         checkIndexNotOutOfBounds(index);
-        if(size >= capacity) {
+        if(size >= storage.length) {
             increaseCapacity();
         }
 
@@ -166,18 +161,18 @@ public class DIYarrayList<T> implements List<T> {
 
     @Override
     public int indexOf(Object o) {
-        int result = -1;
-
         int i = 0;
-        while (i < size() && result < 0) {
-            if(o.equals(storage[i])) {
-                result = i;
-            } else {
-                i++;
+        while (i < size()) {
+            if(o != null && o.equals(storage[i])) {
+                return i;
             }
+            if(o == null && storage[i] == null) {
+                return i;
+            }
+            i++;
         }
 
-        return result;
+        return -1;
     }
 
     @Override
@@ -212,18 +207,79 @@ public class DIYarrayList<T> implements List<T> {
     }
 
     private void increaseCapacity() {
-        int newCapacity = capacity * 2;
+        int newCapacity = storage.length * 2;
         Object[] newStorage = new Object[newCapacity];
 
         System.arraycopy(storage, 0, newStorage, 0, size);
         storage = newStorage;
-        capacity = newCapacity;
     }
 
     private void checkIndexNotOutOfBounds(int index)
     {
         if(index >= size) {
             throw new IndexOutOfBoundsException(String.format("Index %d out of bounds for length %d", index, size()));
+        }
+    }
+
+    class DIYiterator<T> implements ListIterator<T> {
+        private int index = -1;
+        private DIYarrayList<T> list;
+
+        DIYiterator(DIYarrayList<T> list) {
+            this.list = list;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return list.size() > index + 1;
+        }
+
+        @Override
+        public T next() {
+            if(!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            index++;
+            return list.get(index);
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return index > 0;
+        }
+
+        @Override
+        public T previous() {
+            if(!hasPrevious()) {
+                throw new NoSuchElementException();
+            }
+            index--;
+            return list.get(index);
+        }
+
+        @Override
+        public int nextIndex() {
+            return index + 1;
+        }
+
+        @Override
+        public int previousIndex() {
+            return index - 1;
+        }
+
+        @Override
+        public void remove() {
+            list.remove(index);
+        }
+
+        @Override
+        public void set(T t) {
+            list.set(index, t);
+        }
+
+        @Override
+        public void add(T t) {
+            list.add(index, t);
         }
     }
 }

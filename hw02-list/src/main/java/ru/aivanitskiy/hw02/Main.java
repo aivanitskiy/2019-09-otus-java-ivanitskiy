@@ -35,6 +35,11 @@ public class Main <T> {
 
         printList(dest);
         printList(src);
+
+        List<Integer> list = new DIYarrayList<>();
+        list.add(1);
+        list.add(null);
+        System.out.println(list.contains(null));
     }
 
     static void printList(List<?> list) {
