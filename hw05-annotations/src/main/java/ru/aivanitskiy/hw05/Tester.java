@@ -13,7 +13,10 @@ public class Tester {
 
     public Tester(String className) throws ClassNotFoundException, TestConfigurationException {
        this.testedClazz = Class.forName(className);
+       initTestMethods();
+    }
 
+    private void initTestMethods() throws TestConfigurationException {
         for (Method method: testedClazz.getDeclaredMethods()) {
             if(method.isAnnotationPresent(Test.class)) {
                 testedMethods.add(method);
@@ -37,23 +40,28 @@ public class Tester {
 
     public void test() {
         int successCount = 0;
-        for (Method method: testedMethods) {
-            try {
-                var o = testedClazz.getDeclaredConstructor().newInstance();
+
+        try {
+            for (Method method: testedMethods) {
+                Object testedObject = testedClazz.getDeclaredConstructor().newInstance();
 
                 if(before.isPresent()) {
-                    before.get().invoke(o);
+                    before.get().invoke(testedObject);
                 }
 
-                method.invoke(o);
-
-                if(after.isPresent()) {
-                    after.get().invoke(o);
+                try {
+                    method.invoke(testedObject);
+                    successCount++;
+                } catch (Throwable e) {
+                    System.out.println("Error: method " + method.getName());
+                } finally {
+                    if(after.isPresent()) {
+                        after.get().invoke(testedObject);
+                    }
                 }
-                successCount++;
-            } catch (Exception e) {
-                System.out.println("Error: method " + method.getName());
             }
+        } catch (Throwable e) {
+            successCount = 0;
         }
 
         System.out.println(successCount + " / " + testedMethods.size());
