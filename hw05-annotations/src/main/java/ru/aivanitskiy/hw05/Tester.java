@@ -1,5 +1,6 @@
 package ru.aivanitskiy.hw05;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,25 +46,36 @@ public class Tester {
             for (Method method: testedMethods) {
                 Object testedObject = testedClazz.getDeclaredConstructor().newInstance();
 
-                if(before.isPresent()) {
-                    before.get().invoke(testedObject);
-                }
-
                 try {
-                    method.invoke(testedObject);
-                    successCount++;
-                } catch (Throwable e) {
-                    System.out.println("Error: method " + method.getName());
-                } finally {
-                    if(after.isPresent()) {
-                        after.get().invoke(testedObject);
+                    runBefore(testedObject);
+
+                    try {
+                        method.invoke(testedObject);
+                        successCount++;
+                    } catch (Throwable e) {
+                        System.out.println("Error: method " + method.getName());
                     }
+                } finally {
+                    runAfter(testedObject);
                 }
             }
         } catch (Throwable e) {
             successCount = 0;
+            System.out.println("Error: can't test it");
         }
 
         System.out.println(successCount + " / " + testedMethods.size());
+    }
+
+    private void runBefore(Object testedObject) throws InvocationTargetException, IllegalAccessException {
+        if(before.isPresent()) {
+            before.get().invoke(testedObject);
+        }
+    }
+
+    private void runAfter(Object testedObject) throws InvocationTargetException, IllegalAccessException {
+        if(after.isPresent()) {
+            after.get().invoke(testedObject);
+        }
     }
 }
