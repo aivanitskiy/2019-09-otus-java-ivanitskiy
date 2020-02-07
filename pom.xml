@@ -17,6 +17,7 @@
         <module>hw01-maven</module>
         <module>hw02-list</module>
         <module>hw05-annotations</module>
+        <module>hw06-atm</module>
     </modules>
 
     <properties>
@@ -33,6 +34,14 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>28.1-jre</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.4.2</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>
