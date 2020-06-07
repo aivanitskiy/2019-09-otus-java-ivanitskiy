@@ -31,8 +31,8 @@ public class Department {
     public void resetToDefault()
     {
         for(Atm atm: atms) {
-            ResetToDefaultCommand command = new ResetToDefaultCommand(atm);
-            command.execute();
+            ResetToDefaultCommand command = new ResetToDefaultCommand();
+            command.execute(atm);
         }
     }
 }
